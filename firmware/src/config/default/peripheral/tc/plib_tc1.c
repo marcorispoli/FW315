@@ -1,14 +1,14 @@
 /*******************************************************************************
-  Timer/Counter(TC0) PLIB
+  Timer/Counter(TC1) PLIB
 
   Company
     Microchip Technology Inc.
 
   File Name
-    plib_tc0.c
+    plib_tc1.c
 
   Summary
-    TC0 PLIB Implementation File.
+    TC1 PLIB Implementation File.
 
   Description
     This file defines the interface to the TC peripheral library. This
@@ -54,7 +54,7 @@
 */
 
 #include "interrupts.h"
-#include "plib_tc0.h"
+#include "plib_tc1.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -65,146 +65,146 @@
 
 // *****************************************************************************
 // *****************************************************************************
-// Section: TC0 Implementation
+// Section: TC1 Implementation
 // *****************************************************************************
 // *****************************************************************************
 
 /* Initialize TC module in Compare Mode */
-void TC0_CompareInitialize( void )
+void TC1_CompareInitialize( void )
 {
     /* Reset TC */
-    TC0_REGS->COUNT8.TC_CTRLA = TC_CTRLA_SWRST_Msk;
+    TC1_REGS->COUNT16.TC_CTRLA = TC_CTRLA_SWRST_Msk;
 
-    while((TC0_REGS->COUNT8.TC_SYNCBUSY & TC_SYNCBUSY_SWRST_Msk) == TC_SYNCBUSY_SWRST_Msk)
+    while((TC1_REGS->COUNT16.TC_SYNCBUSY & TC_SYNCBUSY_SWRST_Msk) == TC_SYNCBUSY_SWRST_Msk)
     {
         /* Wait for Write Synchronization */
     }
 
     /* Configure counter mode & prescaler */
-    TC0_REGS->COUNT8.TC_CTRLA = TC_CTRLA_MODE_COUNT8 | TC_CTRLA_PRESCALER_DIV1024 | TC_CTRLA_PRESCSYNC_PRESC ;
+    TC1_REGS->COUNT16.TC_CTRLA = TC_CTRLA_MODE_COUNT16 | TC_CTRLA_PRESCALER_DIV1 | TC_CTRLA_PRESCSYNC_PRESC ;
 
     /* Configure waveform generation mode */
-    TC0_REGS->COUNT8.TC_WAVE = (uint8_t)TC_WAVE_WAVEGEN_MFRQ;
+    TC1_REGS->COUNT16.TC_WAVE = (uint8_t)TC_WAVE_WAVEGEN_MFRQ;
 
 
-    TC0_REGS->COUNT8.TC_CC[0] = 1U;
+    TC1_REGS->COUNT16.TC_CC[0] = 500U;
 
     /* Clear all interrupt flags */
-    TC0_REGS->COUNT8.TC_INTFLAG = (uint8_t)TC_INTFLAG_Msk;
+    TC1_REGS->COUNT16.TC_INTFLAG = (uint8_t)TC_INTFLAG_Msk;
 
 
-    while((TC0_REGS->COUNT8.TC_SYNCBUSY) != 0U)
+    while((TC1_REGS->COUNT16.TC_SYNCBUSY) != 0U)
     {
         /* Wait for Write Synchronization */
     }
 }
 
 /* Enable the counter */
-void TC0_CompareStart( void )
+void TC1_CompareStart( void )
 {
-    TC0_REGS->COUNT8.TC_CTRLA |= TC_CTRLA_ENABLE_Msk;
-    while((TC0_REGS->COUNT8.TC_SYNCBUSY & TC_SYNCBUSY_ENABLE_Msk) == TC_SYNCBUSY_ENABLE_Msk)
+    TC1_REGS->COUNT16.TC_CTRLA |= TC_CTRLA_ENABLE_Msk;
+    while((TC1_REGS->COUNT16.TC_SYNCBUSY & TC_SYNCBUSY_ENABLE_Msk) == TC_SYNCBUSY_ENABLE_Msk)
     {
         /* Wait for Write Synchronization */
     }
 }
 
 /* Disable the counter */
-void TC0_CompareStop( void )
+void TC1_CompareStop( void )
 {
-    TC0_REGS->COUNT8.TC_CTRLA &= ~TC_CTRLA_ENABLE_Msk;
-    while((TC0_REGS->COUNT8.TC_SYNCBUSY & TC_SYNCBUSY_ENABLE_Msk) == TC_SYNCBUSY_ENABLE_Msk)
+    TC1_REGS->COUNT16.TC_CTRLA &= ~TC_CTRLA_ENABLE_Msk;
+    while((TC1_REGS->COUNT16.TC_SYNCBUSY & TC_SYNCBUSY_ENABLE_Msk) == TC_SYNCBUSY_ENABLE_Msk)
     {
         /* Wait for Write Synchronization */
     }
 }
 
-uint32_t TC0_CompareFrequencyGet( void )
+uint32_t TC1_CompareFrequencyGet( void )
 {
-    return (uint32_t)(976UL);
+    return (uint32_t)(1000000UL);
 }
 
-void TC0_CompareCommandSet(TC_COMMAND command)
+void TC1_CompareCommandSet(TC_COMMAND command)
 {
-    TC0_REGS->COUNT8.TC_CTRLBSET = (uint8_t)((uint32_t)command << TC_CTRLBSET_CMD_Pos);
-    while((TC0_REGS->COUNT8.TC_SYNCBUSY) != 0U)
+    TC1_REGS->COUNT16.TC_CTRLBSET = (uint8_t)((uint32_t)command << TC_CTRLBSET_CMD_Pos);
+    while((TC1_REGS->COUNT16.TC_SYNCBUSY) != 0U)
     {
         /* Wait for Write Synchronization */
     }    
 }
 
 /* Get the current counter value */
-uint8_t TC0_Compare8bitCounterGet( void )
+uint16_t TC1_Compare16bitCounterGet( void )
 {
     /* Write command to force COUNT register read synchronization */
-    TC0_REGS->COUNT8.TC_CTRLBSET |= (uint8_t)TC_CTRLBSET_CMD_READSYNC;
+    TC1_REGS->COUNT16.TC_CTRLBSET |= (uint8_t)TC_CTRLBSET_CMD_READSYNC;
 
-    while((TC0_REGS->COUNT8.TC_SYNCBUSY & TC_SYNCBUSY_CTRLB_Msk) == TC_SYNCBUSY_CTRLB_Msk)
+    while((TC1_REGS->COUNT16.TC_SYNCBUSY & TC_SYNCBUSY_CTRLB_Msk) == TC_SYNCBUSY_CTRLB_Msk)
     {
         /* Wait for Write Synchronization */
     }
 
-    while((TC0_REGS->COUNT8.TC_CTRLBSET & TC_CTRLBSET_CMD_Msk) != 0U)
+    while((TC1_REGS->COUNT16.TC_CTRLBSET & TC_CTRLBSET_CMD_Msk) != 0U)
     {
         /* Wait for CMD to become zero */
     }
 
     /* Read current count value */
-    return (uint8_t)TC0_REGS->COUNT8.TC_COUNT;
+    return (uint16_t)TC1_REGS->COUNT16.TC_COUNT;
 }
 
 /* Configure counter value */
-void TC0_Compare8bitCounterSet( uint8_t count )
+void TC1_Compare16bitCounterSet( uint16_t count )
 {
-    TC0_REGS->COUNT8.TC_COUNT = count;
+    TC1_REGS->COUNT16.TC_COUNT = count;
 
-    while((TC0_REGS->COUNT8.TC_SYNCBUSY & TC_SYNCBUSY_COUNT_Msk) == TC_SYNCBUSY_COUNT_Msk)
+    while((TC1_REGS->COUNT16.TC_SYNCBUSY & TC_SYNCBUSY_COUNT_Msk) == TC_SYNCBUSY_COUNT_Msk)
     {
         /* Wait for Write Synchronization */
     }
 }
 
 /* Configure period value */
-bool TC0_Compare8bitPeriodSet( uint8_t period )
+bool TC1_Compare16bitPeriodSet( uint16_t period )
 {
     bool status = false;
-    if((TC0_REGS->COUNT8.TC_STATUS & TC_STATUS_PERBUFV_Msk) == 0U)
+    if((TC1_REGS->COUNT16.TC_STATUS & TC_STATUS_CCBUFV0_Msk) == 0U)
     {
         /* Configure period value */
-        TC0_REGS->COUNT8.TC_PERBUF = period;
+        TC1_REGS->COUNT16.TC_CCBUF[0] = period;
         status = true;
     }
     return status;
 }
 
 /* Read period value */
-uint8_t TC0_Compare8bitPeriodGet( void )
+uint16_t TC1_Compare16bitPeriodGet( void )
 {
     /* Get period value */
-    return (uint8_t)TC0_REGS->COUNT8.TC_PER;
+    return (uint16_t)TC1_REGS->COUNT16.TC_CC[0];
 }
 
 /* Configure duty cycle value */
-bool TC0_Compare8bitMatch0Set( uint8_t compareValue )
+bool TC1_Compare16bitMatch0Set( uint16_t compareValue )
 {
     bool status = false;
-    if((TC0_REGS->COUNT8.TC_STATUS & TC_STATUS_CCBUFV0_Msk) == 0U)
+    if((TC1_REGS->COUNT16.TC_STATUS & TC_STATUS_CCBUFV0_Msk) == 0U)
     {
         /* Set new compare value for compare channel 0 */
-        TC0_REGS->COUNT8.TC_CCBUF[0] = compareValue;
+        TC1_REGS->COUNT16.TC_CCBUF[0] = compareValue;
         status = true;
     }
-
     return status;
 }
 
-bool TC0_Compare8bitMatch1Set( uint8_t compareValue )
+/* Configure duty cycle value */
+bool TC1_Compare16bitMatch1Set( uint16_t compareValue )
 {
     bool status = false;
-    if((TC0_REGS->COUNT8.TC_STATUS & TC_STATUS_CCBUFV1_Msk) == 0U)
+    if((TC1_REGS->COUNT16.TC_STATUS & TC_STATUS_CCBUFV1_Msk) == 0U)
     {
         /* Set new compare value for compare channel 1 */
-        TC0_REGS->COUNT8.TC_CCBUF[1] = compareValue;
+        TC1_REGS->COUNT16.TC_CCBUF[1] = compareValue;
         status = true;
     }
     return status;
@@ -215,11 +215,11 @@ bool TC0_Compare8bitMatch1Set( uint8_t compareValue )
 
 
 /* Check if period interrupt flag is set */
-TC_COMPARE_STATUS TC0_CompareStatusGet( void )
+TC_COMPARE_STATUS TC1_CompareStatusGet( void )
 {
     TC_COMPARE_STATUS compare_status;
-    compare_status = ((TC_COMPARE_STATUS)(TC0_REGS->COUNT8.TC_INTFLAG));
+    compare_status = ((TC_COMPARE_STATUS)(TC1_REGS->COUNT16.TC_INTFLAG));
     /* Clear timer overflow interrupt */
-    TC0_REGS->COUNT8.TC_INTFLAG = (uint8_t)compare_status;
+    TC1_REGS->COUNT16.TC_INTFLAG = (uint8_t)compare_status;
     return compare_status;
 }

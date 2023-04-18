@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-  <executable name="dist/default/production/FW315.X.production.elf">
+  <executable name="dist/default/debug/FW315.X.debug.elf">
     <memory name="program">
       <units>bytes</units>
       <length>1048576</length>
-      <used>5134</used>
-      <free>1043442</free>
+      <used>4812</used>
+      <free>1043764</free>
     </memory>
     <memory name="data">
       <units>bytes</units>
       <length>262144</length>
-      <used>331</used>
-      <free>261813</free>
+      <used>332</used>
+      <free>261812</free>
     </memory>
   </executable>
 </project>

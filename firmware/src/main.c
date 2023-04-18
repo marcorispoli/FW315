@@ -28,6 +28,10 @@
 #include "definitions.h"                // SYS function prototypes
 #include "application.h"
 #include "Protocol/protocol.h"
+#include "Filter/filter.h"
+#include "XrayTube/xray_tube.h"
+#include "PowerLed/power_led.h"
+
 
 
 
@@ -66,14 +70,17 @@ int main ( void )
     RTC_Timer32Start(); // Start the RTC module
             
     // Start the TCo to start the Vitality LED
-    TC0_CompareStart();
+    //TC0_CompareStart();
     
     
     
     // Application Protocol initialization
     ApplicationProtocolInit();
     
-    
+    // Modules initialization
+    PowerLedInit();
+    FilterInit();
+    XrayInit();
     
     while ( true )
     {
@@ -89,27 +96,24 @@ int main ( void )
         // Timer events activated into the RTC interrupt
         if(trigger_time & _7820_us_TriggerTime){
             trigger_time &=~ _7820_us_TriggerTime;
-            
-             
-            Protocol_7280_us_callback();
-            
+            Protocol_7280_us_callback();  
+            FilterTest();
         }
 
         if(trigger_time & _15_64_ms_TriggerTime){
-            trigger_time &=~ _15_64_ms_TriggerTime;
-               
+            trigger_time &=~ _15_64_ms_TriggerTime;      
+            PowerLedLoop();
+            XrayLoop();
         }
         
         
                 
-        if(trigger_time & _15_64_ms_TriggerTime){
-            trigger_time &=~ _15_64_ms_TriggerTime;
-             //MET_Can_Open_Send_WriteData(1,0x20,0,0,0);
-                //VITALITY_LED_Toggle();
-                /*
-                if(GeneratorGetHvOn()) VITALITY_LED_Set();
-                else VITALITY_LED_Clear();
-                */   
+        if(trigger_time & _1024_ms_TriggerTime){
+            trigger_time &=~ _1024_ms_TriggerTime;
+            
+            
+            VITALITY_LED_Toggle();            
+            
         }        
      
 

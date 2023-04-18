@@ -48,15 +48,6 @@ static void OSCCTRL_Initialize(void)
 
 static void OSC32KCTRL_Initialize(void)
 {
-    /****************** XOSC32K initialization  ******************************/
-
-    /* Configure 32K External Oscillator */
-    OSC32KCTRL_REGS->OSC32KCTRL_XOSC32K = OSC32KCTRL_XOSC32K_STARTUP(2) | OSC32KCTRL_XOSC32K_ENABLE_Msk | OSC32KCTRL_XOSC32K_CGM(1) | OSC32KCTRL_XOSC32K_EN32K_Msk | OSC32KCTRL_XOSC32K_XTALEN_Msk;
-
-    while(!((OSC32KCTRL_REGS->OSC32KCTRL_STATUS & OSC32KCTRL_STATUS_XOSC32KRDY_Msk) == OSC32KCTRL_STATUS_XOSC32KRDY_Msk))
-    {
-        /* Waiting for the XOSC32K Ready state */
-    }
 
     OSC32KCTRL_REGS->OSC32KCTRL_RTCCTRL = OSC32KCTRL_RTCCTRL_RTCSEL(0);
 }
@@ -180,7 +171,7 @@ void CLOCK_Initialize (void)
 
 
     /* Selection of the Generator and write Lock for TC0 TC1 */
-    GCLK_REGS->GCLK_PCHCTRL[9] = GCLK_PCHCTRL_GEN(0x3)  | GCLK_PCHCTRL_CHEN_Msk;
+    GCLK_REGS->GCLK_PCHCTRL[9] = GCLK_PCHCTRL_GEN(0x2)  | GCLK_PCHCTRL_CHEN_Msk;
 
     while ((GCLK_REGS->GCLK_PCHCTRL[9] & GCLK_PCHCTRL_CHEN_Msk) != GCLK_PCHCTRL_CHEN_Msk)
     {
@@ -200,12 +191,29 @@ void CLOCK_Initialize (void)
     {
         /* Wait for synchronization */
     }
+    /* Selection of the Generator and write Lock for ADC0 */
+    GCLK_REGS->GCLK_PCHCTRL[40] = GCLK_PCHCTRL_GEN(0x1)  | GCLK_PCHCTRL_CHEN_Msk;
+
+    while ((GCLK_REGS->GCLK_PCHCTRL[40] & GCLK_PCHCTRL_CHEN_Msk) != GCLK_PCHCTRL_CHEN_Msk)
+    {
+        /* Wait for synchronization */
+    }
+    /* Selection of the Generator and write Lock for ADC1 */
+    GCLK_REGS->GCLK_PCHCTRL[41] = GCLK_PCHCTRL_GEN(0x1)  | GCLK_PCHCTRL_CHEN_Msk;
+
+    while ((GCLK_REGS->GCLK_PCHCTRL[41] & GCLK_PCHCTRL_CHEN_Msk) != GCLK_PCHCTRL_CHEN_Msk)
+    {
+        /* Wait for synchronization */
+    }
 
     /* Configure the AHB Bridge Clocks */
     MCLK_REGS->MCLK_AHBMASK = 0xfbffff;
 
     /* Configure the APBA Bridge Clocks */
-    MCLK_REGS->MCLK_APBAMASK = 0x47ff;
+    MCLK_REGS->MCLK_APBAMASK = 0xc7ff;
+
+    /* Configure the APBD Bridge Clocks */
+    MCLK_REGS->MCLK_APBDMASK = 0x180;
 
 
 }
