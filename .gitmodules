@@ -1,0 +1,3 @@
+[submodule "firmware/src/Shared"]
+	path = firmware/src/Shared
+	url = git@gitlab.tecnico.local:metaltronica/firmware/production/z190-dimobis/shared.git

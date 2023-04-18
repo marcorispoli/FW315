@@ -1,0 +1,7 @@
+
+*.cof
+*.o
+*.d
+*.err
+*.lst
+firmware/doc/html/**

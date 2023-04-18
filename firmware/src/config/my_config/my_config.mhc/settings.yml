@@ -1,0 +1,14 @@
+configName: my_config
+folderName: my_first_project
+format_version: v1.0
+frameworkPath: ../../../../Harmony3
+processor: ATSAME51J20A
+projectName: my_first_project
+settings:
+  PackageFilter: audio;azure-rtos-threadx;bootloader;bootloader_apps_can;bootloader_apps_ethernet;bootloader_apps_i2c;bootloader_apps_sdcard;bootloader_apps_serial_memory;bootloader_apps_uart;bootloader_apps_usb;bsp;bt;classb_sam_e5x_d5x;core;core_apps_sam_d5x_e5x;crypto;csp;csp_apps_sam_d5x_e5x;ethercat;gfx;gfx_apps;gfx_apps_sam_d5x_e5x;gfx_aria;mbed_os_rtos;mbed_os_rtos_apps;mc_apps_sam_d5x_e5x;motor_control;net;net_apps_sam_e5x;quick_docs;reference_apps;touch;touch_apps;usb;usb_apps_device;usb_apps_dual_role;usb_apps_host;usb_apps_multi_controller;x2c
+  FORCE_OPTIMIZATION: 'false'
+  GENERATE_BACKUP: 'true'
+  TRUSTZONE: 'false'
+  CMSISPath: .\dev_packs\arm\CMSIS\5.7.0
+  MERGE_STRATEGY: USER_ALL
+  DFPPath: .\dev_packs\Microchip\SAME51_DFP\3.4.98\atdf\ATSAME51J20A.atdf

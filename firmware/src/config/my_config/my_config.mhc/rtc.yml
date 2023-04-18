@@ -1,0 +1,43 @@
+format_version: v1.0
+type: UniqueComponent
+attributes: {id: rtc}
+children:
+- type: Symbols
+  children:
+  - type: Hex
+    attributes: {id: RTC_MODE0_EVCTRL}
+    children:
+    - type: Values
+      children:
+      - type: Dynamic
+        attributes: {id: rtc, value: '0'}
+  - type: Boolean
+    attributes: {id: RTC_MODE0_EVCTRL_PEREO7_ENABLE}
+    children:
+    - type: Values
+      children:
+      - type: User
+        attributes: {value: 'false'}
+  - type: Hex
+    attributes: {id: RTC_MODE0_INTENSET}
+    children:
+    - type: Values
+      children:
+      - type: Dynamic
+        attributes: {id: rtc, value: '128'}
+  - type: Boolean
+    attributes: {id: RTC_MODE0_INTENSET_PER3_ENABLE}
+    children:
+    - type: Values
+      children:
+      - type: User
+        attributes: {value: 'false'}
+  - type: Boolean
+    attributes: {id: RTC_MODE0_INTENSET_PER7_ENABLE}
+    children:
+    - type: Values
+      children:
+      - type: User
+        attributes: {value: 'true'}
+- type: ElementPosition
+  attributes: {x: '16', y: '245', id: rtc}
