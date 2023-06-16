@@ -2,14 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/C:/Users/marco/Documents/Data/Progetti-GIT/FW/fw_pcb315/firmware/src/XrayTube/xray_tube.c</file>
-            <file>file:/C:/Users/marco/Documents/Data/Progetti-GIT/FW/fw_pcb315/firmware/src/PowerLed/power_led.c</file>
-            <file>file:/C:/Users/marco/Documents/Data/Progetti-GIT/FW/fw_pcb315/firmware/src/Filter/filter.h</file>
-            <file>file:/C:/Users/marco/Documents/Data/Progetti-GIT/FW/fw_pcb315/firmware/src/config/default/peripheral/clock/plib_clock.c</file>
-            <file>file:/C:/Users/marco/Documents/Data/Progetti-GIT/FW/fw_pcb315/firmware/src/config/default/initialization.c</file>
-            <file>file:/C:/Users/marco/Documents/Data/Progetti-GIT/FW/fw_pcb315/firmware/src/main.c</file>
-            <file>file:/C:/Users/marco/Documents/Data/Progetti-GIT/FW/fw_pcb315/firmware/src/Filter/filter.c</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

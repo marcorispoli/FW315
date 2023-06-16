@@ -108,7 +108,8 @@ bool TC1_Compare16bitMatch1Set( uint16_t compareValue );
 
 
 
-TC_COMPARE_STATUS TC1_CompareStatusGet( void );
+void TC1_CompareCallbackRegister( TC_COMPARE_CALLBACK callback, uintptr_t context );
+
 
 void TC1_CompareCommandSet(TC_COMMAND command);
 

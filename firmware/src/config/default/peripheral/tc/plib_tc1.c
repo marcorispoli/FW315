@@ -62,6 +62,7 @@
 // *****************************************************************************
 // *****************************************************************************
 
+static TC_COMPARE_CALLBACK_OBJ TC1_CallbackObject;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -87,11 +88,14 @@ void TC1_CompareInitialize( void )
     TC1_REGS->COUNT16.TC_WAVE = (uint8_t)TC_WAVE_WAVEGEN_MFRQ;
 
 
-    TC1_REGS->COUNT16.TC_CC[0] = 500U;
+    TC1_REGS->COUNT16.TC_CC[0] = 1U;
 
     /* Clear all interrupt flags */
     TC1_REGS->COUNT16.TC_INTFLAG = (uint8_t)TC_INTFLAG_Msk;
 
+    /* Enable period Interrupt */
+    TC1_CallbackObject.callback = NULL;
+    TC1_REGS->COUNT16.TC_INTENSET = (uint8_t)(TC_INTENSET_OVF_Msk);
 
     while((TC1_REGS->COUNT16.TC_SYNCBUSY) != 0U)
     {
@@ -214,12 +218,27 @@ bool TC1_Compare16bitMatch1Set( uint16_t compareValue )
 
 
 
-/* Check if period interrupt flag is set */
-TC_COMPARE_STATUS TC1_CompareStatusGet( void )
+/* Register callback function */
+void TC1_CompareCallbackRegister( TC_COMPARE_CALLBACK callback, uintptr_t context )
 {
-    TC_COMPARE_STATUS compare_status;
-    compare_status = ((TC_COMPARE_STATUS)(TC1_REGS->COUNT16.TC_INTFLAG));
-    /* Clear timer overflow interrupt */
-    TC1_REGS->COUNT16.TC_INTFLAG = (uint8_t)compare_status;
-    return compare_status;
+    TC1_CallbackObject.callback = callback;
+
+    TC1_CallbackObject.context = context;
 }
+
+/* Compare match interrupt handler */
+void TC1_CompareInterruptHandler( void )
+{
+    if (TC1_REGS->COUNT16.TC_INTENSET != 0U)
+    {
+        TC_COMPARE_STATUS status;
+        status = TC1_REGS->COUNT16.TC_INTFLAG;
+        /* clear period interrupt */
+        TC1_REGS->COUNT16.TC_INTFLAG = (uint8_t)TC_INTFLAG_Msk;
+        if((status != TC_COMPARE_STATUS_NONE) && TC1_CallbackObject.callback != NULL)
+        {
+            TC1_CallbackObject.callback(status, TC1_CallbackObject.context);
+        }
+    }
+}
+

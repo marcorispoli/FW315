@@ -19,6 +19,7 @@ void XrayInit(void){
 }
     
 void XrayLoop(void){
+    /*
     static bool button_stat = false;
     
     
@@ -28,6 +29,7 @@ void XrayLoop(void){
         if(button_stat) FAN_ON;
         else FAN_OFF;
     }
+    */
     
     // 10 bit Temperature input
     tubeTemp = ADC0_ConversionResultGet();

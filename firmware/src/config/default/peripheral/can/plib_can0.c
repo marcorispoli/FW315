@@ -71,8 +71,14 @@ static const can_sidfe_registers_t can0StdFilter[] =
     {
         .CAN_SIDFE_0 = CAN_SIDFE_0_SFT(0UL) |
                   CAN_SIDFE_0_SFID1(0x204UL) |
-                  CAN_SIDFE_0_SFID2(0x211UL) |
+                  CAN_SIDFE_0_SFID2(0x204UL) |
                   CAN_SIDFE_0_SFEC(1UL)
+    },
+    {
+        .CAN_SIDFE_0 = CAN_SIDFE_0_SFT(0UL) |
+                  CAN_SIDFE_0_SFID1(0x104UL) |
+                  CAN_SIDFE_0_SFID2(0x104UL) |
+                  CAN_SIDFE_0_SFEC(2UL)
     },
 };
 
@@ -537,7 +543,7 @@ void CAN0_MessageRAMConfigSet(uint8_t *msgRAMConfigBaseAddress)
            CAN0_STD_MSG_ID_FILTER_SIZE);
     offset += CAN0_STD_MSG_ID_FILTER_SIZE;
     /* Standard ID Filter Configuration Register */
-    CAN0_REGS->CAN_SIDFC = CAN_SIDFC_LSS(1UL) |
+    CAN0_REGS->CAN_SIDFC = CAN_SIDFC_LSS(2UL) |
             CAN_SIDFC_FLSSA((uint32_t)can0Obj.msgRAMConfig.stdMsgIDFilterAddress);
 
 
@@ -574,7 +580,7 @@ void CAN0_MessageRAMConfigSet(uint8_t *msgRAMConfigBaseAddress)
 */
 bool CAN0_StandardFilterElementSet(uint8_t filterNumber, can_sidfe_registers_t *stdMsgIDFilterElement)
 {
-    if ((filterNumber > 1U) || (stdMsgIDFilterElement == NULL))
+    if ((filterNumber > 2U) || (stdMsgIDFilterElement == NULL))
     {
         return false;
     }
@@ -605,7 +611,7 @@ bool CAN0_StandardFilterElementSet(uint8_t filterNumber, can_sidfe_registers_t *
 */
 bool CAN0_StandardFilterElementGet(uint8_t filterNumber, can_sidfe_registers_t *stdMsgIDFilterElement)
 {
-    if ((filterNumber > 1U) || (stdMsgIDFilterElement == NULL))
+    if ((filterNumber > 2U) || (stdMsgIDFilterElement == NULL))
     {
         return false;
     }
