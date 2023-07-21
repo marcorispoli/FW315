@@ -76,15 +76,9 @@
 */
 
 // Application Revision 
-#define MET_CAN_APP_MAJ_REV   1 //!< Revision Major Number
-#define MET_CAN_APP_MIN_REV   0 //!< Revision Minor Number
-#define MET_CAN_APP_SUB_REV   1 //!< Revision build Number
-
-// Can Module Definitions
-#define MET_CAN_APP_DEVICE_ID     0x4 //!< Application DEVICE CAN Id address
-#define MET_CAN_STATUS_REGISTERS    3 //!< Defines the total number of implemented STATUS registers 
-#define MET_CAN_DATA_REGISTERS      1 //!< Defines the total number of implemented Application DATA registers 
-#define MET_CAN_PARAM_REGISTERS     12 //!< Defines the total number of implemented PARAMETER registers 
+static const unsigned char  APPLICATION_MAJ_REV =  1 ;  //!< Revision Major Number
+static const unsigned char  APPLICATION_MIN_REV =  0 ;  //!< Revision Minor Number
+static const unsigned char  APPLICATION_SUB_REV =  1 ;  //!< Revision build Number
 
 /** @}*/
         

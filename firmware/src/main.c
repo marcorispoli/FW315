@@ -96,7 +96,6 @@ int main ( void )
         // Timer events activated into the RTC interrupt
         if(trigger_time & _7820_us_TriggerTime){
             trigger_time &=~ _7820_us_TriggerTime;
-            Protocol_7280_us_callback();  
             FilterTest();
         }
 
