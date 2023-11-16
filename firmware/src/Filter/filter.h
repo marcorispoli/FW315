@@ -93,7 +93,11 @@
     ext void FilterInit(void);            
     ext void FilterLoop(void);
     ext void FilterTest(void);
-        
+    ext bool FilterSelect(uint8_t filter);
+    ext bool FilterIsTarget(uint8_t filter);
+    ext bool FilterIsRunning(void);
+    ext bool FilterIsError(void);
+    
     /** @}*/ // filterApiModule
     
      /**
@@ -135,7 +139,8 @@
         // Filter positioning data
         bool    command_activated;  //!< A command is in execution
         bool    slot_valid;         //!< A valid slot is selected
-        uint8_t target_slot;        //!< Target slot selected                
+        uint8_t target_slot;        //!< Target slot selected 
+        uint8_t target_filter;      //!< This is the Filter code requested
         uint32_t target_slot_position[5]; //!< Define the calibrated position for every slot
         
         // Slot detection        
@@ -163,6 +168,14 @@
     * \defgroup filterMacroModule Module's Macros
     *  @{
     */
+    
+    #define FILTER1_SLOT    0
+    #define FILTER2_SLOT    1
+    #define FILTER3_SLOT    3
+    #define FILTER4_SLOT    4
+    #define MIRROR_SLOT     2
+
+    
     #define um_step_dimension   ((uint32_t) 13)   //!< (micro-meter) linear space per pulse  
     #define umToSteps(val) (((uint32_t) val) / ( (uint32_t) um_step_dimension)) //!< Macro conversion from um to pulse
     #define stepsToum(val) (((uint32_t) val) * ( (uint32_t) um_step_dimension)) //!< Macro conversion from step to um

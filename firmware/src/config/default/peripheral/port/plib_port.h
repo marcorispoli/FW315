@@ -83,6 +83,10 @@
 #define uc_MS2_Get()               (((PORT_REGS->GROUP[0].PORT_IN >> 3U)) & 0x01U)
 #define uc_MS2_PIN                  PORT_PIN_PA03
 
+/*** Macros for uc_COMPONENT pin ***/
+#define uc_COMPONENT_Get()               (((PORT_REGS->GROUP[1].PORT_IN >> 7U)) & 0x01U)
+#define uc_COMPONENT_PIN                  PORT_PIN_PB07
+
 /*** Macros for uc_TSTAT pin ***/
 #define uc_TSTAT_Get()               (((PORT_REGS->GROUP[1].PORT_IN >> 8U)) & 0x01U)
 #define uc_TSTAT_PIN                  PORT_PIN_PB08

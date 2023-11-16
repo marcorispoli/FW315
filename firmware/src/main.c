@@ -41,7 +41,7 @@
 // Section: Main Entry Point
 // *****************************************************************************
 // *****************************************************************************
-static uint8_t trigger_time = 0;
+static volatile uint8_t trigger_time = 0;
 
 #define _1024_ms_TriggerTime 0x1
 #define _7820_us_TriggerTime 0x2
@@ -102,7 +102,7 @@ int main ( void )
         if(trigger_time & _15_64_ms_TriggerTime){
             trigger_time &=~ _15_64_ms_TriggerTime;      
             PowerLedLoop();
-            XrayLoop();
+            
         }
         
         
@@ -110,7 +110,7 @@ int main ( void )
         if(trigger_time & _1024_ms_TriggerTime){
             trigger_time &=~ _1024_ms_TriggerTime;
             
-            
+            XrayLoop();            
             VITALITY_LED_Toggle();            
             
         }        

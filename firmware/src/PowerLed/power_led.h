@@ -53,6 +53,9 @@
         
         ext void PowerLedLoop(void);
         
+        ext void PowerLedOff(void);
+        ext void PowerLedOn(void);
+        
         
         
     /** @}*/ // powerLedApiModule

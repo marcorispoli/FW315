@@ -22,7 +22,6 @@
 static void filterCallback(TC_COMPARE_STATUS status, uintptr_t context); //!< Callback every STEP pin changes
 static volatile FILTER_MOTOR_t filterMotor; //!< Motor main structure variable declaration
 
-
 /**
  * This function sets the Motor Torque
  *   
@@ -118,13 +117,10 @@ void FilterInit(void){
     filterMotor.slot_valid = false;
     filterMotor.command_sequence = 0;
     filterMotor.running = false; 
+  
+    // Initializes the Protocol
+    SETBYTE_SLOT_SELECTED(SYSTEM_OUT_POSITION);
     
-    filterMotor.target_slot_position[0] = umToSteps(100);
-    filterMotor.target_slot_position[1] = umToSteps(0);
-    filterMotor.target_slot_position[2] = umToSteps(0);
-    filterMotor.target_slot_position[3] = umToSteps(0);        
-    filterMotor.target_slot_position[4] = umToSteps(0);
-
     // Disables the motor driver
     setFaseCurrentMode(_CURLIM_DISABLE);    
     MOTOR_RST_OFF;
@@ -136,26 +132,57 @@ void FilterInit(void){
     // Registers the working callback
     TC1_CompareCallbackRegister(filterCallback, 0);
 
+    
 }
 
-/**
- * This function activate the procedure to select a given slot
- * 
- * @param slot: this is the slot number to be selected [0:4]
- * 
- * @return 
- *  - true: in case of success;
- *  - false: command is in execution of slot out of range 
- */
-bool selectSlot(uint8_t slot){
+
+bool FilterIsRunning(void){
+     return filterMotor.command_activated;
+}
+
+bool FilterIsError(void){
+     return  (!filterMotor.slot_valid) ;
+}
+ 
+bool FilterIsTarget(uint8_t filter){
+    if(!filterMotor.slot_valid) return false;
+    if(filterMotor.command_activated) return false;
+    if(filter != filterMotor.target_filter) return false;
+    
+    return true;
+}
+
+bool FilterSelect(uint8_t filter){
+
+    // Command Busy
     if(filterMotor.command_activated ) return false;
-    if(slot >= 5) return false;
     
-    filterMotor.command_activated = true;            
+    // Assignes the current target position
+    if(filter == POSITIONER_SELECT_FILTER1){ 
+        filterMotor.target_slot = FILTER1_SLOT;
+        filterMotor.target_slot_position[FILTER1_SLOT] = umToSteps(GETWORD_PARAMETER_FILTER1_POSITION);        
+    }  else if(filter == POSITIONER_SELECT_FILTER2){ 
+        filterMotor.target_slot = FILTER2_SLOT;
+        filterMotor.target_slot_position[FILTER2_SLOT] = umToSteps(GETWORD_PARAMETER_FILTER2_POSITION);
+    }  else if(filter == POSITIONER_SELECT_FILTER3){ 
+        filterMotor.target_slot = FILTER3_SLOT;
+        filterMotor.target_slot_position[FILTER3_SLOT] = umToSteps(GETWORD_PARAMETER_FILTER3_POSITION);
+    }  else if(filter == POSITIONER_SELECT_FILTER4){ 
+        filterMotor.target_slot = FILTER4_SLOT;
+        filterMotor.target_slot_position[FILTER4_SLOT] = umToSteps(GETWORD_PARAMETER_FILTER4_POSITION);
+    }  else if(filter == POSITIONER_SELECT_MIRROR){ 
+        filterMotor.target_slot = MIRROR_SLOT;
+        filterMotor.target_slot_position[MIRROR_SLOT] = umToSteps(GETWORD_PARAMETER_MIRROR_POSITION);
+    }  else return false; 
     
-    filterMotor.target_slot = slot;     
+ 
+    filterMotor.target_filter = filter;
+    filterMotor.command_activated = true;        
     filterMotor.command_sequence = 0;
     filterMotor.slot_valid = false;
+    
+    // Set the Protocol Filter status to running mode
+    SETBYTE_SLOT_SELECTED(SYSTEM_SELECTION_PENDING);
     
     startMotor(MOTOR_DIR_HOME,MOTOR_SPEED_HOME);                  
     return true;
@@ -173,14 +200,15 @@ void stopMotor(STOPMODE_t cause, FASE_CURRENT_MODE_t torque){
         filterMotor.cause = cause;
         filterMotor.running = false;
         MOTOR_LED_OFF;       
+       
 }
 
 
 void FilterTest2(void){
-    static uint8_t filtro = 0;
-    if(selectSlot(filtro)){
+    static uint8_t filtro = SYSTEM_FILTER1_SELECTED;
+    if(FilterSelect(filtro)){
         filtro++;
-        if(filtro >= 5 ) filtro =0;        
+        if(filtro > SYSTEM_MIRROR_SELECTED ) filtro = SYSTEM_FILTER1_SELECTED;        
     }
 }
 
@@ -442,12 +470,20 @@ void filterCallback(TC_COMPARE_STATUS status, uintptr_t context){
    
    // If an error condition was detected, the activation ends in 
    if(error){
-       error = false;
-       stopMotor(_STOP_BECAUSE_ERROR, _CURLIM_LOW);
-       TC1_CompareStop();
-       filterMotor.command_activated = false;            
-       filterMotor.slot_valid = false;
-       return;
+        error = false;
+        stopMotor(_STOP_BECAUSE_ERROR, _CURLIM_LOW);
+        TC1_CompareStop();
+        filterMotor.command_activated = false;            
+        filterMotor.slot_valid = false;
+        
+        unsigned char error_pers0;
+        MET_Can_Protocol_GetErrors(0, 0, &error_pers0, 0);
+        error_pers0 |= PERS0_FILTER_SEL_FAIL;       
+        MET_Can_Protocol_SetErrors(0, 0, &error_pers0, 0);
+        
+        SETBYTE_SLOT_SELECTED(SYSTEM_OUT_POSITION); // Sets the OUT OF POSITION on the Status register
+        setFilterError(true);        
+        return;
    }
    
    // If the complete activation has been detected, the activation ends
@@ -455,9 +491,25 @@ void filterCallback(TC_COMPARE_STATUS status, uintptr_t context){
        stopMotor(_STOP_BECAUSE_TARGET, _CURLIM_LOW);
        TC1_CompareStop();
        filterMotor.command_activated = false;            
-       filterMotor.slot_valid = true;
+       filterMotor.slot_valid = true;       
+       
+       // Sets the current selection on the STATUS register
+        if(filterMotor.target_filter == POSITIONER_SELECT_FILTER1) SETBYTE_SLOT_SELECTED(SYSTEM_FILTER1_SELECTED);
+        else if(filterMotor.target_filter == POSITIONER_SELECT_FILTER2) SETBYTE_SLOT_SELECTED(SYSTEM_FILTER2_SELECTED);
+        else if(filterMotor.target_filter == POSITIONER_SELECT_FILTER3) SETBYTE_SLOT_SELECTED(SYSTEM_FILTER3_SELECTED);
+        else if(filterMotor.target_filter == POSITIONER_SELECT_FILTER4) SETBYTE_SLOT_SELECTED(SYSTEM_FILTER4_SELECTED);
+        else if(filterMotor.target_filter == POSITIONER_SELECT_MIRROR) SETBYTE_SLOT_SELECTED(SYSTEM_MIRROR_SELECTED);
+        else{
+            setFilterError(true);
+            SETBYTE_SLOT_SELECTED(SYSTEM_OUT_POSITION);
+            return;
+        } 
+        setFilterError(false);
+        
        return;
    }
+   
+   
    
     // Acceleration ramp
     uint16_t current_period = TC1_Compare16bitPeriodGet();
@@ -468,3 +520,4 @@ void filterCallback(TC_COMPARE_STATUS status, uintptr_t context){
     }
     
 }
+

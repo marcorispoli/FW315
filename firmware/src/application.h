@@ -76,8 +76,8 @@
 */
 
 // Application Revision 
-static const unsigned char  APPLICATION_MAJ_REV =  1 ;  //!< Revision Major Number
-static const unsigned char  APPLICATION_MIN_REV =  0 ;  //!< Revision Minor Number
+static const unsigned char  APPLICATION_MAJ_REV =  0 ;  //!< Revision Major Number
+static const unsigned char  APPLICATION_MIN_REV =  2 ;  //!< Revision Minor Number
 static const unsigned char  APPLICATION_SUB_REV =  1 ;  //!< Revision build Number
 
 /** @}*/
