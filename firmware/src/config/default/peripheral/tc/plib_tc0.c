@@ -62,6 +62,7 @@
 // *****************************************************************************
 // *****************************************************************************
 
+static TC_COMPARE_CALLBACK_OBJ TC0_CallbackObject;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -81,17 +82,20 @@ void TC0_CompareInitialize( void )
     }
 
     /* Configure counter mode & prescaler */
-    TC0_REGS->COUNT8.TC_CTRLA = TC_CTRLA_MODE_COUNT8 | TC_CTRLA_PRESCALER_DIV1024 | TC_CTRLA_PRESCSYNC_PRESC ;
+    TC0_REGS->COUNT8.TC_CTRLA = TC_CTRLA_MODE_COUNT8 | TC_CTRLA_PRESCALER_DIV256 | TC_CTRLA_PRESCSYNC_PRESC ;
 
     /* Configure waveform generation mode */
     TC0_REGS->COUNT8.TC_WAVE = (uint8_t)TC_WAVE_WAVEGEN_MFRQ;
 
 
-    TC0_REGS->COUNT8.TC_CC[0] = 1U;
+    TC0_REGS->COUNT8.TC_CC[0] = 8U;
 
     /* Clear all interrupt flags */
     TC0_REGS->COUNT8.TC_INTFLAG = (uint8_t)TC_INTFLAG_Msk;
 
+    /* Enable period Interrupt */
+    TC0_CallbackObject.callback = NULL;
+    TC0_REGS->COUNT8.TC_INTENSET = (uint8_t)(TC_INTENSET_OVF_Msk);
 
     while((TC0_REGS->COUNT8.TC_SYNCBUSY) != 0U)
     {
@@ -121,7 +125,7 @@ void TC0_CompareStop( void )
 
 uint32_t TC0_CompareFrequencyGet( void )
 {
-    return (uint32_t)(976UL);
+    return (uint32_t)(3906UL);
 }
 
 void TC0_CompareCommandSet(TC_COMMAND command)
@@ -214,12 +218,27 @@ bool TC0_Compare8bitMatch1Set( uint8_t compareValue )
 
 
 
-/* Check if period interrupt flag is set */
-TC_COMPARE_STATUS TC0_CompareStatusGet( void )
+/* Register callback function */
+void TC0_CompareCallbackRegister( TC_COMPARE_CALLBACK callback, uintptr_t context )
 {
-    TC_COMPARE_STATUS compare_status;
-    compare_status = ((TC_COMPARE_STATUS)(TC0_REGS->COUNT8.TC_INTFLAG));
-    /* Clear timer overflow interrupt */
-    TC0_REGS->COUNT8.TC_INTFLAG = (uint8_t)compare_status;
-    return compare_status;
+    TC0_CallbackObject.callback = callback;
+
+    TC0_CallbackObject.context = context;
 }
+
+/* Compare match interrupt handler */
+void TC0_CompareInterruptHandler( void )
+{
+    if (TC0_REGS->COUNT8.TC_INTENSET != 0U)
+    {
+        TC_COMPARE_STATUS status;
+        status = TC0_REGS->COUNT8.TC_INTFLAG;
+        /* clear period interrupt */
+        TC0_REGS->COUNT8.TC_INTFLAG = (uint8_t)TC_INTFLAG_Msk;
+        if((status != TC_COMPARE_STATUS_NONE) && TC0_CallbackObject.callback != NULL)
+        {
+            TC0_CallbackObject.callback(status, TC0_CallbackObject.context);
+        }
+    }
+}
+

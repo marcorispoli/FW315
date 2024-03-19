@@ -60,7 +60,7 @@ static void rtcEventHandler (RTC_TIMER32_INT_MASK intCause, uintptr_t context)
 
 int main ( void )
 {
-  
+    
     /* Initialize all modules */
     SYS_Initialize ( NULL );
     
@@ -69,10 +69,6 @@ int main ( void )
     RTC_Timer32CallbackRegister(rtcEventHandler, 0);
     RTC_Timer32Start(); // Start the RTC module
             
-    // Start the TCo to start the Vitality LED
-    //TC0_CompareStart();
-    
-    
     
     // Application Protocol initialization
     ApplicationProtocolInit();
@@ -90,13 +86,14 @@ int main ( void )
         // Protocol management
         ApplicationProtocolLoop();
         
-        // CanOpen management
-       
         
+       
+                
         // Timer events activated into the RTC interrupt
         if(trigger_time & _7820_us_TriggerTime){
             trigger_time &=~ _7820_us_TriggerTime;
             FilterTest();
+            
         }
 
         if(trigger_time & _15_64_ms_TriggerTime){

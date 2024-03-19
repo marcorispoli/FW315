@@ -176,7 +176,6 @@ extern void TCC3_MC1_Handler           ( void ) __attribute__((weak, alias("Dumm
 extern void TCC4_OTHER_Handler         ( void ) __attribute__((weak, alias("Dummy_Handler")));
 extern void TCC4_MC0_Handler           ( void ) __attribute__((weak, alias("Dummy_Handler")));
 extern void TCC4_MC1_Handler           ( void ) __attribute__((weak, alias("Dummy_Handler")));
-extern void TC0_Handler                ( void ) __attribute__((weak, alias("Dummy_Handler")));
 extern void TC2_Handler                ( void ) __attribute__((weak, alias("Dummy_Handler")));
 extern void TC3_Handler                ( void ) __attribute__((weak, alias("Dummy_Handler")));
 extern void TC4_Handler                ( void ) __attribute__((weak, alias("Dummy_Handler")));
@@ -320,7 +319,7 @@ const H3DeviceVectors exception_table=
     .pfnTCC4_OTHER_Handler         = TCC4_OTHER_Handler,
     .pfnTCC4_MC0_Handler           = TCC4_MC0_Handler,
     .pfnTCC4_MC1_Handler           = TCC4_MC1_Handler,
-    .pfnTC0_Handler                = TC0_Handler,
+    .pfnTC0_Handler                = TC0_CompareInterruptHandler,
     .pfnTC1_Handler                = TC1_CompareInterruptHandler,
     .pfnTC2_Handler                = TC2_Handler,
     .pfnTC3_Handler                = TC3_Handler,

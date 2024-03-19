@@ -213,6 +213,7 @@ void FilterTest2(void){
 }
 
 void FilterTest(void){
+    return;
     static bool button_stat = false;
 
     if(uc_OPTO_Get()){

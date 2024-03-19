@@ -9,6 +9,8 @@
 
 static unsigned char statorPerc;
 static unsigned char bulbPerc;
+static unsigned char XrayFanDutyCycle;
+static void XrayFanManagement(TC_COMPARE_STATUS status, uintptr_t context);
 
 /*
  * Lookup Table 
@@ -37,10 +39,16 @@ static unsigned char bulbPerc;
  */
 void XrayInit(void){
     FAN_OFF;
+    XrayFanDutyCycle = 0;
     ADC0_Enable();
     ADC1_Enable();
     ADC0_ConversionStart();
     ADC1_ConversionStart();
+    
+    TC0_CompareStop();
+    TC0_CompareCallbackRegister(XrayFanManagement, 0);    
+    TC0_Compare8bitPeriodSet(1);   
+    TC0_CompareStart();  
 }
 
 typedef struct{
@@ -88,21 +96,7 @@ static unsigned char analogToPerc(unsigned char sensor){
 }
 
 void XrayLoop(void){
-    
-    
-    /*
-    static bool button_stat = false;
-    
-    
-    if(button_stat != uc_PUSHBUTTON_Get()){
-        button_stat = uc_PUSHBUTTON_Get();
-        
-        if(button_stat) FAN_ON;
-        else FAN_OFF;
-    }
-    */
-    
-    
+    static int last_perc = -10;
     
     // Evaluates the Stator Sensor
     unsigned char statorSens = ADC0_ConversionResultGet();
@@ -118,10 +112,11 @@ void XrayLoop(void){
         setStatorErrorShort(true);       
     }
     else {
-        if( statorSens >= 84 ) setStatorErrorHigh(true);       
         statorPerc = analogToPerc(statorSens);
+        if( statorPerc >= 84 ) setStatorErrorHigh(true);      
     }
-    
+    SETBYTE_STATOR_PERCENT(statorPerc);
+            
     // Evaluates the Bulb Sensor
     unsigned char bulbSens = ADC1_ConversionResultGet();
     setBulbErrorLow(false);
@@ -134,8 +129,33 @@ void XrayLoop(void){
         bulbPerc = 0;
         setBulbErrorShort(true);
     }else {
-        if( bulbSens >=84 ) setBulbErrorHigh(true);        
-        bulbPerc = analogToPerc(bulbSens);       
+        bulbPerc = analogToPerc(bulbSens);      
+        if( bulbPerc >=84 ) setBulbErrorHigh(true);                 
     }    
+    SETBYTE_BULB_PERCENT(bulbPerc);
     
+    int max_perc;
+    
+    if(bulbPerc > statorPerc) max_perc = (int) bulbPerc;
+    else max_perc = (int) statorPerc;
+    
+    // Implement an histeresys to prevent the FAN oscillation
+    if( (max_perc > last_perc + 5) || (max_perc < last_perc - 5)){
+        last_perc = max_perc;        
+        
+        if(last_perc < 10) XrayFanDutyCycle = 0;
+        else XrayFanDutyCycle = (last_perc / 10);
+    }
+   
+   
+}
+
+void XrayFanManagement(TC_COMPARE_STATUS status, uintptr_t context){
+    static unsigned char pwm_counter = 0;
+    
+    if(pwm_counter >= XrayFanDutyCycle) FAN_OFF;
+    else FAN_ON;
+    
+    pwm_counter++;
+    if(pwm_counter >= 10) pwm_counter = 0;
 }
